@@ -1,0 +1,8 @@
+digraph {
+	A [label="Data Discovery using Aurum"]
+	B [label="Data Wrangling using Trifacta"]
+	C [label="Data integtration using Tamr"]
+	A -> B
+	A -> C
+	B -> C
+}
