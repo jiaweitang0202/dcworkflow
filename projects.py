@@ -3,7 +3,7 @@ from graphviz import *
 
 def newProject():
     print ("create a new project\n")
-    dot = Digraph(comment='The Workflow Graph')
+    dot = Digraph('workflow_graph')
 
     return dot
     
