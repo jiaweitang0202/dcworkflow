@@ -1,31 +1,47 @@
-#import jgraph
 from graphviz import *
+from IPython.display import Image, display
+import pydot
+
+##########################
+# Functions for projects #
+##########################
 
 def newProject():
     print ("create a new project\n")
-    dot = Digraph('workflow_graph')
-
-    return dot
-    
+    return pydot.Dot(type = 'diagraph')
     
 def loadProject(input_file):
     print ("load an existing project from: " + input_file + "\n")
-    
-    file = open(input_file, 'r')
-    text = file.read()
-    dot = Source(text)
-    
-    return dot
+    return pydot.graph_from_dot_file(input_file)[0]
 
-
-def saveProject(dot, output_file):
+def saveProject(workflow_graph, output_file):
     print ("save the current project to: " + output_file + "\n")
-    dot.render(output_file)
+    workflow_graph.write(output_file)
     
 def closeProject():
     print ("close the current project")
     
-def addFunction(dot):
-    dot.add_node('D', 'Golden Record')
-    #dot.addedge('C', 'D')
-    return dot
+    
+##########################
+#  #
+##########################
+
+# TODO
+# Learn to add attribute for the tracker file
+# We need to associate with each node a tracker file
+# function
+# input tables
+# output tables
+# other fine-grained information
+
+def addFunction(wg, from_node, function_name):
+    new_node = pydot.Node(function_name)
+    wg.add_edge(pydot.Edge(from_node, new_node))
+    return wg
+    
+##########################
+#    Helper Functions    #
+##########################    
+    
+def viewPydot(pdot_graph):
+    display(Image(pdot_graph.create_png()))
