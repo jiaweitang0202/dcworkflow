@@ -38,9 +38,14 @@ class GoldenRecord(EntityConsolidation): #subclass, inherits from SuperHero
         return outputTables
     
 # Node attributes
+# 1. Tracker file for each node
+
+
+# Tracker file
 # 1. Input Tables: a string, by default "null"
 # 2. Output Tables: a string, by default "null"
 # 3. Function
+# 4. Other informaiton for tracking 
 
 
 # TODO
