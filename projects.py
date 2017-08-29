@@ -21,10 +21,27 @@ def saveProject(workflow_graph, output_file):
 def closeProject():
     print ("close the current project")
     
+
+##########################
+# Service Entity Consolidation #
+##########################
+
+class EntityConsolidation(object): #superclass, inherits from default object
+    def getName(self):
+        raise NotImplementedError
     
-##########################
-#  #
-##########################
+class GoldenRecord(EntityConsolidation): #subclass, inherits from SuperHero
+    def getName(self):
+        return "Golden Record" 
+    def excute(inputTables):
+        outputTables = "null"
+        return outputTables
+    
+# Node attributes
+# 1. Input Tables: a string, by default "null"
+# 2. Output Tables: a string, by default "null"
+# 3. Function
+
 
 # TODO
 # Learn to add attribute for the tracker file
@@ -34,7 +51,7 @@ def closeProject():
 # output tables
 # other fine-grained information
 
-def addFunction(wg, from_node, function_name):
+def createNode(wg, from_node, function_name):
     new_node = pydot.Node(function_name)
     wg.add_edge(pydot.Edge(from_node, new_node))
     return wg
