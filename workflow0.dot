@@ -1,6 +1,6 @@
 digraph G {
 type=diagraph;
-Aurum;
-Tamr;
-Aurum -> Tamr;
+Aurum1;
+Tamr1;
+Aurum1 -> Tamr1;
 }

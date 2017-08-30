@@ -8,9 +8,8 @@ class EntityConsolidation(object): #superclass, inherits from default object
     
 class GoldenRecord(EntityConsolidation): #subclass, inherits from SuperHero
     def getName(self):
-        return "Golden Record" 
+        return "Golden Record for Entity Consolidation" 
     def excute(inputTables):
         outputTables = "null"
         print (inputTables)
         return outputTables
-    

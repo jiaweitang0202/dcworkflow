@@ -20,7 +20,24 @@ def saveProject(workflow_graph, output_file):
     
 def closeProject():
     print ("close the current project")
-   
+
+##################################
+#    Operating Workflow graph    #
+##################################    
+
+def createNode(wg, from_node, function_name):
+    new_node = pydot.Node(function_name)
+    wg.add_edge(pydot.Edge(from_node, new_node))
+    
+    return wg
+    
+##########################
+#    Helper Functions    #
+##########################    
+    
+def viewPydot(pdot_graph):
+    display(Image(pdot_graph.create_png()))    
+
     
 # Node attributes
 # 1. Tracker file for each node
@@ -31,24 +48,3 @@ def closeProject():
 # 2. Output Tables: a string, by default "null"
 # 3. Function
 # 4. Other informaiton for tracking 
-
-
-# TODO
-# Learn to add attribute for the tracker file
-# We need to associate with each node a tracker file
-# function
-# input tables
-# output tables
-# other fine-grained information
-
-def createNode(wg, from_node, function_name):
-    new_node = pydot.Node(function_name)
-    wg.add_edge(pydot.Edge(from_node, new_node))
-    return wg
-    
-##########################
-#    Helper Functions    #
-##########################    
-    
-def viewPydot(pdot_graph):
-    display(Image(pdot_graph.create_png()))
