@@ -35,6 +35,7 @@ class GoldenRecord(EntityConsolidation): #subclass, inherits from SuperHero
         return "Golden Record" 
     def excute(inputTables):
         outputTables = "null"
+        print (inputTables)
         return outputTables
     
 # Node attributes
