@@ -36,8 +36,7 @@ def createNode(wg, from_node, function_name):
 ##########################    
     
 def viewPydot(pdot_graph):
-    display(Image(pdot_graph.create_png()))    
-
+    display(Image(pdot_graph.create_png())) 
     
 # Node attributes
 # 1. Tracker file for each node
