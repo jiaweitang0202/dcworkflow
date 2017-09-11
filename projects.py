@@ -1,3 +1,5 @@
+import os
+import shutil, sys
 from graphviz import *
 from IPython.display import Image, display
 import pydot
@@ -6,21 +8,67 @@ import pydot
 # Functions for projects #
 ##########################
 
-def newProject():
-    print ("create a new project\n")
-    return pydot.Dot(type = 'diagraph')
-    
-def loadProject(input_file):
-    print ("load an existing project from: " + input_file + "\n")
-    return pydot.graph_from_dot_file(input_file)[0]
 
-def saveProject(workflow_graph, output_file):
-    print ("save the current project to: " + output_file + "\n")
-    workflow_graph.write(output_file)
-    
-def closeProject():
-    print ("close the current project")
+class Project:
+    """Class to store project information """
+    Project_Name = ""
+    wg = None
 
+    def printProject(self):
+        if self.wg:
+            wg_str = self.wg.to_string()
+            print(wg_str)
+        else:
+            print("Empty Project ...")
+
+    def newProject(self, P_Name):
+        ProjectsParentDir = '../Workspace/'
+        Project_Directory = ProjectsParentDir + P_Name
+        self.Project_Name = P_Name
+        if not os.path.exists(ProjectsParentDir):
+            os.makedirs(ProjectsParentDir)
+        if not os.path.exists(Project_Directory):
+            os.makedirs(Project_Directory)
+            print ("New project created successfully\n")
+        self.wg = pydot.Dot(type = 'diagraph')
+        
+    def loadProject(self, P_Name):
+        self.saveProject(1);
+        ProjectsParentDir = '../Workspace/'
+        self.Project_Name = P_Name
+        input_file = ProjectsParentDir + P_Name +'/' + P_Name + '.dot'
+        print ("load an existing project from: " + input_file + "\n")
+        self.wg = pydot.graph_from_dot_file(input_file)[0]
+
+    def saveProject(self, flag = 0):
+        if self.wg:
+            ProjectsParentDir = '../Workspace/'
+            output_file = ProjectsParentDir + self.Project_Name +'/' + self.Project_Name + '.dot'
+            if not flag: 
+                print ("save the current project to: " + output_file + "\n")
+            self.wg.write(output_file)
+
+        
+    def closeProject(self):
+        self.saveProject(1)
+        self.Project_Name = ""
+        self.wg = None
+        print ("close the current project")
+
+    def deleteProject(self, Project_Name=None):
+        if not Project_Name:
+            Project_Name = self.Project_Name
+        if not Project_Name:
+            print("Project is not available or it has been closed .. ")
+        else:
+            ProjectsParentDir = '../Workspace/'
+            Project_Directory = ProjectsParentDir + Project_Name
+            if os.path.exists(Project_Directory):
+                shutil.rmtree(Project_Directory)
+                self.Project_Name = ""
+                self.wg = None
+                print ("Project ( ", Project_Name, ") has been deleted successfully .. ")
+        
 ##################################
 #    Operating Workflow graph    #
 ##################################    
