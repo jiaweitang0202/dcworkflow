@@ -13,20 +13,20 @@ class Project:
     """Class to store project information """
     Project_Name = ""
     wg = None
+    ProjectsParentDir = '../CivilizerWorkspace/'
 
     def printProject(self):
         if self.wg:
             wg_str = self.wg.to_string()
             print(wg_str)
         else:
-            print("Empty Project ...")
+            print("Either the project is empty or it has been closed ...")
 
     def newProject(self, P_Name):
-        ProjectsParentDir = '../Workspace/'
-        Project_Directory = ProjectsParentDir + P_Name
+        Project_Directory = self.ProjectsParentDir + P_Name
         self.Project_Name = P_Name
-        if not os.path.exists(ProjectsParentDir):
-            os.makedirs(ProjectsParentDir)
+        if not os.path.exists(self.ProjectsParentDir):
+            os.makedirs(self.ProjectsParentDir)
         if not os.path.exists(Project_Directory):
             os.makedirs(Project_Directory)
             print ("New project created successfully\n")
@@ -34,16 +34,14 @@ class Project:
         
     def loadProject(self, P_Name):
         self.saveProject(1);
-        ProjectsParentDir = '../Workspace/'
         self.Project_Name = P_Name
-        input_file = ProjectsParentDir + P_Name +'/' + P_Name + '.dot'
+        input_file = self.ProjectsParentDir + P_Name +'/' + P_Name + '.dot'
         print ("load an existing project from: " + input_file + "\n")
         self.wg = pydot.graph_from_dot_file(input_file)[0]
 
     def saveProject(self, flag = 0):
         if self.wg:
-            ProjectsParentDir = '../Workspace/'
-            output_file = ProjectsParentDir + self.Project_Name +'/' + self.Project_Name + '.dot'
+            output_file = self.ProjectsParentDir + self.Project_Name +'/' + self.Project_Name + '.dot'
             if not flag: 
                 print ("save the current project to: " + output_file + "\n")
             self.wg.write(output_file)
@@ -61,8 +59,7 @@ class Project:
         if not Project_Name:
             print("Project is not available or it has been closed .. ")
         else:
-            ProjectsParentDir = '../Workspace/'
-            Project_Directory = ProjectsParentDir + Project_Name
+            Project_Directory = self.ProjectsParentDir + Project_Name
             if os.path.exists(Project_Directory):
                 shutil.rmtree(Project_Directory)
                 self.Project_Name = ""
