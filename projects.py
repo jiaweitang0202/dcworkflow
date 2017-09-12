@@ -7,41 +7,70 @@ import pydot
 ##########################
 # Functions for projects #
 ##########################
+WorkingDir = '../CivilizerWorkspace/'
 
+class node:
+    """Class to store information about individual components in the project"""
+    global WorkingDir
+    node_id = ""
+    input_sources = ""
+    input_file = ""
+    output_file = ""
+    tracking_file = "" 
+    
+    def createNode(self, node_name, Project):
+        self.node_id = node_name
+        inputF = WorkingDir + Project + '_' + node_name + '.input'
+        self.input_file = os.path.abspath(inputF) 
+        outputF = WorkingDir + Project + '_' + node_name + '.output'
+        self.output_file = os.path.abspath(outputF)
+        tracker = WorkingDir + Project + '_' + node_name + '.tracker'
+        self.tracking_file = os.path.abspath(tracker)
+    
+    def printNode(self):
+        print("Name:", self.node_id)
+        print("input file:", self.input_file)
+        print("output file:", self.output_file)
+        print("input sources:", self.input_sources)
+        print("==================================")
 
 class Project:
     """Class to store project information """
     Project_Name = ""
     wg = None
-    ProjectsParentDir = '../CivilizerWorkspace/'
+    nodes_details = []
+    global WorkingDir
 
     def printProject(self):
         if self.wg:
             wg_str = self.wg.to_string()
             print(wg_str)
         else:
-            print("Either the project is empty or it has been closed ...")
+            print("Error: either the project is empty or it has been closed ...")
 
     def newProject(self, P_Name):
-        Project_Directory = self.ProjectsParentDir + P_Name
+        Project_Directory = WorkingDir + P_Name
         self.Project_Name = P_Name
-        if not os.path.exists(self.ProjectsParentDir):
-            os.makedirs(self.ProjectsParentDir)
+        if not os.path.exists(WorkingDir):
+            os.makedirs(WorkingDir)
         if not os.path.exists(Project_Directory):
             os.makedirs(Project_Directory)
             print ("New project created successfully\n")
-        self.wg = pydot.Dot(type = 'diagraph')
+        if self.nodes_details:
+            for n in self.nodes_details:
+                self.nodes_details.remove(n)
+        self.wg = pydot.Dot(type = 'digraph')
         
     def loadProject(self, P_Name):
         self.saveProject(1);
         self.Project_Name = P_Name
-        input_file = self.ProjectsParentDir + P_Name +'/' + P_Name + '.dot'
+        input_file = WorkingDir + P_Name +'/' + P_Name + '.dot'
         print ("load an existing project from: " + input_file + "\n")
         self.wg = pydot.graph_from_dot_file(input_file)[0]
 
     def saveProject(self, flag = 0):
         if self.wg:
-            output_file = self.ProjectsParentDir + self.Project_Name +'/' + self.Project_Name + '.dot'
+            output_file = WorkingDir + self.Project_Name +'/' + self.Project_Name + '.dot'
             if not flag: 
                 print ("save the current project to: " + output_file + "\n")
             self.wg.write(output_file)
@@ -50,6 +79,7 @@ class Project:
     def closeProject(self):
         self.saveProject(1)
         self.Project_Name = ""
+        self.nodes_details = []
         self.wg = None
         print ("close the current project")
 
@@ -59,22 +89,138 @@ class Project:
         if not Project_Name:
             print("Project is not available or it has been closed .. ")
         else:
-            Project_Directory = self.ProjectsParentDir + Project_Name
+            Project_Directory = WorkingDir + Project_Name
             if os.path.exists(Project_Directory):
                 shutil.rmtree(Project_Directory)
                 self.Project_Name = ""
                 self.wg = None
+                self.nodes_details = []
                 print ("Project ( ", Project_Name, ") has been deleted successfully .. ")
+
+    def addNode(self, node_name):
+        if not self.wg:
+            print("Error: Node cannot be added .. project is not available or it has been closed .. ")
+            return
+        Nodes = self.wg.get_nodes()
+        for n in Nodes:
+            if n.get_name() == node_name:
+                print("Error: node (", node_name, ") was added before .. Please consider using different node name")
+                return
+        newN = node()
+        newN.createNode(node_name, self.Project_Name)
+        new_node = pydot.Node(node_name)
+        self.wg.add_node(new_node)
+        self.nodes_details.append(newN)
+
+    def deleteNode(self, node_name):
+        if not self.wg:
+            print("Error: Node cannot be added .. project is not available or it has been closed .. ")
+            return
+        Nodes = self.wg.get_nodes()
+        reqNode = None
+        for n in Nodes:
+            if n.get_name() == node_name:
+                reqNode = n
+                break
+        if not reqNode:
+            print("Error: attempting to delete non-existing node .. ")
+            return 
+        Edges = self.wg.get_edges()
+        for e in Edges:
+            if ((e.get_source() == node_name) or (e.get_destination() == node_name)):
+                self.wg.del_edge(e.get_source(), e.get_destination())
+                # return
+        self.wg.del_node(reqNode)
+        for nn in self.nodes_details:
+            if nn.node_id == node_name:
+                self.nodes_details.remove(nn)
+                break
+        self.wg.del_node(n)
+        print("Node (", node_name, ") was deleted successfully .. ")
+
+    def deleteEdge(self, from_node, to_node):
+        if not self.wg:
+            print("Error: attempting to delete non-existing edge .. ")
+            return
+        Edges = self.wg.get_edges()
+        for e in Edges:
+            if ((e.get_source() == from_node) and (e.get_destination() == to_node)):
+                self.wg.del_edge(from_node, to_node)
+                return
+        print("Error: attempting to delete non-existing edge .. ")
+
+    def edge_exists(self, from_node, to_node):
+        Edges = self.wg.get_edges()
+        for e in Edges:
+            if ((e.get_source() == from_node) and (e.get_destination() == to_node)):
+                print("Error: Edge already exists .. ")
+                return 1
+        return 0
+
+    def addEdge(self, from_node, to_node):
+        edge_nodes = []
+        """Check if the working graph has been created or not """
+        if not self.wg:
+            print("Error: Edge cannot be added .. project is not available or it has been closed .. ")
+            return
+
+        if (self.edge_exists(from_node, to_node)): 
+            return 
+        Nodes = self.wg.get_nodes()
+        """ Search for 'from_node' int the graph """
+        node_exist = 0
+        for e in Nodes:
+            if e.get_name() == from_node:
+                node_exist = 1
+                edge_nodes.append(e)
+                break;
+        if not node_exist: 
+            print("Error: node (", from_node, ") doesn\'t exist")
+            return 
+        """ Search for 'to_node' int the graph """
+        node_exist = 0
+        for e in Nodes:
+            if e.get_name() == to_node:
+                node_exist = 1
+                edge_nodes.append(e)
+                break;
+        if not node_exist: 
+            print("The node (", to_node, ") doesn\'t exist")
+            return 
+        self.wg.add_edge(pydot.Edge(edge_nodes[0], edge_nodes[1]))
+
+        # print ("Modifying the list of sources")
+        for i in range(len(self.nodes_details)):
+            if self.nodes_details[i].node_id == to_node:
+                # print ("To", to_nd.node_id, to_node) 
+                for j in range(len(self.nodes_details)):
+                    if self.nodes_details[j].node_id == from_node:
+                        # print ("From : ", self.nodes_details[j].output_file)
+                        if not (self.nodes_details[j].output_file in self.nodes_details[i].input_sources):
+                            self.nodes_details[i].input_sources = self.nodes_details[i].input_sources + self.nodes_details[j].output_file + ";"
+                            # print("Modified : ", self.nodes_details[i].input_sources)
+                            break
+                break
         
+
+    # def createEdge(from_node, to_node):
+    def addNodeInput(self, node_name, newInputFile):
+        if not self.wg:
+            print("Error (Empty Project): project is not available or it has been closed .. ")
+            return
+        inputFileAdd = os.path.abspath(newInputFile)
+        for n in self.nodes_details:
+            if n.node_id == node_name:
+                n.input_sources = n.input_sources + inputFileAdd + ";"
+                break
+        
+        
+            
 ##################################
 #    Operating Workflow graph    #
 ##################################    
 
-def createNode(wg, from_node, function_name):
-    new_node = pydot.Node(function_name)
-    wg.add_edge(pydot.Edge(from_node, new_node))
-    
-    return wg
+
     
 ##########################
 #    Helper Functions    #
