@@ -11,9 +11,10 @@ class DataDiscovery(object): #superclass, inherits from default object
 class Aurum(DataDiscovery): #subclass, inherits from SuperHero
     def getName(self):
         return "Aurum for Data Discovery" 
-    def excute(inputTables):
+    def execute(self, inputTables):
         # TODO: Please add the function here to compute and write outputTables
         outputTables = inputTables
+        print("Running", self.getName())
         return outputTables
     
 
@@ -28,9 +29,10 @@ class JoinDiscovery(object): #superclass, inherits from default object
 class DongJoin(JoinDiscovery): #subclass, inherits from SuperHero
     def getName(self):
         return "DongJoin for Join Discovery" 
-    def excute(inputTables):
+    def execute(self, inputTables):
         # TODO: Please add the function here to compute and write outputTables
         outputTables = inputTables
+        print("Running", self.getName())
         return outputTables
     
 
@@ -45,17 +47,19 @@ class DataTransformation(object): #superclass, inherits from default object
 class DBXFormer(DataTransformation): #subclass, inherits from SuperHero
     def getName(self):
         return "DBXFormer for Data Transformation" 
-    def excute(inputTables):
+    def execute(self, inputTables):
         # TODO: Please add the function here to compute and write outputTables
         outputTables = inputTables
+        print("Running", self.getName())
         return outputTables
 
 class WenboMethod(DataTransformation): #subclass, inherits from SuperHero
     def getName(self):
         return "Wenbo's method for Data Transformation" 
-    def excute(inputTables):
+    def execute(self, inputTables):
         # TODO: Please add the function here to compute and write outputTables
         outputTables = inputTables
+        print("Running", self.getName())
         return outputTables
     
     
@@ -70,9 +74,10 @@ class EntityMatching(object): #superclass, inherits from default object
 class Tamr(EntityMatching): #subclass, inherits from SuperHero
     def getName(self):
         return "Tamr for Entity Matching" 
-    def excute(inputTables):
+    def execute(self, inputTables):
         # TODO: Please add the function here to compute and write outputTables
         outputTables = inputTables
+        print("Running", self.getName())
         return outputTables
     
     
@@ -87,9 +92,10 @@ class EntityConsolidation(object): #superclass, inherits from default object
 class GoldenRecord(EntityConsolidation): #subclass, inherits from SuperHero
     def getName(self):
         return "Golden Record for Entity Consolidation" 
-    def excute(inputTables):
+    def execute(self, inputTables):
         # TODO: Please add the function here to compute and write outputTables
         outputTables = inputTables
+        print("Running", self.getName())
         return outputTables
     
     
@@ -104,15 +110,20 @@ class ErrorDetection(object): #superclass, inherits from default object
 class DetectDisguisedMissingValues(ErrorDetection): #subclass, inherits from SuperHero
     def getName(self):
         return "Detect Disguised Missing Values for Error Detection" 
-    def excute(inputTables):
+    def execute(self, inputTables):
         # TODO: Please add the function here to compute and write outputTables
         outputTables = inputTables
+        print("Running", self.getName())
         return outputTables    
     
 class DBoost(ErrorDetection): #subclass, inherits from SuperHero
     def getName(self):
         return "DBoost for Error Detection" 
-    def excute(inputTables):
+    def execute(self, inputTables):
         # TODO: Please add the function here to compute and write outputTables
         outputTables = inputTables
+        print("Running", self.getName())
         return outputTables        
+
+
+        

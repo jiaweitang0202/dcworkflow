@@ -3,7 +3,7 @@ import shutil, sys
 from graphviz import *
 from IPython.display import Image, display
 import pydot
-
+from services import *
 ##########################
 # Functions for projects #
 ##########################
@@ -13,13 +13,15 @@ class node:
     """Class to store information about individual components in the project"""
     global WorkingDir
     node_id = ""
+    node_functionality = ""
     input_sources = ""
     input_file = ""
     output_file = ""
     tracking_file = "" 
     
-    def createNode(self, node_name, Project):
+    def createNode(self, node_name, node_type, Project):
         self.node_id = node_name
+        self.node_functionality = node_type
         inputF = WorkingDir + Project + '_' + node_name + '.input'
         self.input_file = os.path.abspath(inputF) 
         outputF = WorkingDir + Project + '_' + node_name + '.output'
@@ -57,16 +59,38 @@ class Project:
             os.makedirs(Project_Directory)
             print ("New project created successfully\n")
         if self.nodes_details:
-            for n in self.nodes_details:
-                self.nodes_details.remove(n)
+            for i in range(len(self.nodes_details)):
+                self.nodes_details.remove(self.nodes_details[0])
         self.wg = pydot.Dot(type = 'digraph')
         
     def loadProject(self, P_Name):
         self.saveProject(1);
-        self.Project_Name = P_Name
+        self.closeProject(1)
         input_file = WorkingDir + P_Name +'/' + P_Name + '.dot'
         print ("load an existing project from: " + input_file + "\n")
-        self.wg = pydot.graph_from_dot_file(input_file)[0]
+        oldwg = pydot.graph_from_dot_file(input_file)[0]
+        self.newProject(P_Name)
+        self.wg = oldwg
+        if not self.wg:
+            print("This is an empty project .. the system will create a new project .. ")
+            return
+        for n in self.wg.get_nodes():
+            newN = node()
+            functionality = n.get_label().replace("\"", "")
+            newN.createNode(n.get_name(), functionality, self.Project_Name)
+            self.nodes_details.append(newN)
+        for e in self.wg.get_edges():
+            for i in range(len(self.nodes_details)):
+                if self.nodes_details[i].node_id == e.get_destination():
+                    # print ("To", to_nd.node_id, to_node) 
+                    for j in range(len(self.nodes_details)):
+                        if self.nodes_details[j].node_id == e.get_source():
+                            # print ("From : ", self.nodes_details[j].output_file)
+                            if not (self.nodes_details[j].output_file in self.nodes_details[i].input_sources):
+                                self.nodes_details[i].input_sources = self.nodes_details[i].input_sources + self.nodes_details[j].output_file + ";"
+                                # print("Modified : ", self.nodes_details[i].input_sources)
+                                break
+                    break
 
     def saveProject(self, flag = 0):
         if self.wg:
@@ -76,12 +100,13 @@ class Project:
             self.wg.write(output_file)
 
         
-    def closeProject(self):
+    def closeProject(self, flag = 0):
         self.saveProject(1)
         self.Project_Name = ""
         self.nodes_details = []
         self.wg = None
-        print ("close the current project")
+        if not flag:
+            print ("close the current project")
 
     def deleteProject(self, Project_Name=None):
         if not Project_Name:
@@ -97,7 +122,12 @@ class Project:
                 self.nodes_details = []
                 print ("Project ( ", Project_Name, ") has been deleted successfully .. ")
 
-    def addNode(self, node_name):
+    """
+        Adding a new node requires creating an object of the class 'node' to hold the 
+        information about the node. This object is added to the nodes_details list
+        and a node is added to the working graph
+    """
+    def addNode(self, node_name, functionality):
         if not self.wg:
             print("Error: Node cannot be added .. project is not available or it has been closed .. ")
             return
@@ -107,11 +137,15 @@ class Project:
                 print("Error: node (", node_name, ") was added before .. Please consider using different node name")
                 return
         newN = node()
-        newN.createNode(node_name, self.Project_Name)
-        new_node = pydot.Node(node_name)
+        newN.createNode(node_name, functionality, self.Project_Name)
+        new_node = pydot.Node(node_name, label=functionality)
         self.wg.add_node(new_node)
         self.nodes_details.append(newN)
 
+    """
+        Deleting a given node requires deleting its information in nodes_details, 
+        the edges from and to that node and finally removing the node from the graph
+    """
     def deleteNode(self, node_name):
         if not self.wg:
             print("Error: Node cannot be added .. project is not available or it has been closed .. ")
@@ -138,6 +172,7 @@ class Project:
         self.wg.del_node(n)
         print("Node (", node_name, ") was deleted successfully .. ")
 
+    """Remove an edge from the graph"""
     def deleteEdge(self, from_node, to_node):
         if not self.wg:
             print("Error: attempting to delete non-existing edge .. ")
@@ -149,6 +184,7 @@ class Project:
                 return
         print("Error: attempting to delete non-existing edge .. ")
 
+    """Check if the edge already exist or not """
     def edge_exists(self, from_node, to_node):
         Edges = self.wg.get_edges()
         for e in Edges:
@@ -213,7 +249,36 @@ class Project:
             if n.node_id == node_name:
                 n.input_sources = n.input_sources + inputFileAdd + ";"
                 break
-        
+    def executeNode(self, node_name):
+        target_node = None
+        for n in self.nodes_details:
+            if n.node_id == node_name:
+                functionality = n.node_functionality
+                target_node = n
+                break;
+        if not target_node:
+            print("Error, incorrect node_id .. ")
+            return
+        X = self.get_class_by_func(functionality)
+        X.execute(target_node.input_file)
+
+    def get_class_by_func(self, fn):
+        if fn == 'Aurum': 
+            X = Aurum(); return X
+        elif fn == 'Tamr':
+            X = Tamr(); return X
+        elif fn == 'DBXFormer':
+            X = DBXFormer(); return X
+        elif fn == 'GoldenRecord':
+            X = GoldenRecord(); return X
+        elif fn == 'DongJoin':
+            X = DongJoin(); return X
+        elif fn == 'WenboMethod':
+            X = WenboMethod(); return X
+        elif fn == 'DetectDisguisedMissingValues':
+            X = DetectDisguisedMissingValues(); return X
+        elif fn == 'DBoost':
+            X = DBoost(); return X 
         
             
 ##################################
