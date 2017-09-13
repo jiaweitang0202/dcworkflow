@@ -42,7 +42,7 @@ class Project:
     wg = None
     nodes_details = []
     global WorkingDir
-
+    """ Printing the nodes and eges as string """
     def printProject(self):
         if self.wg:
             wg_str = self.wg.to_string()
