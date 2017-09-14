@@ -4,6 +4,7 @@ from graphviz import *
 from IPython.display import Image, display
 import pydot
 from services import *
+from data_reader import *
 ##########################
 # Functions for projects #
 ##########################
