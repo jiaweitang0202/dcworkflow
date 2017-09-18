@@ -1,6 +1,0 @@
-digraph G {
-type=diagraph;
-Aurum1;
-Tamr1;
-Aurum1 -> Tamr1;
-}
