@@ -8,7 +8,7 @@ from data_reader import *
 ##########################
 # Functions for projects #
 ##########################
-WorkingDir = '../CivilizerWorkspace/'
+WorkingDir = 'CivilizerWorkspace/'
 
 class node:
     """Class to store information about individual components in the project"""
@@ -333,17 +333,18 @@ class Project:
         sources = self.nodes_details[node_name].input_sources
         files = sources.split(';')
         for f_name in files:
-            try:
-                with open(f_name) as data_file:
-                    try:    
-                        data = json.load(data_file)
-                        sources_list.append(data)
-                    except:
-                        print("Cannot read json file .. (", f_name, ")")
-                        return None
-            except:
-                print("File not found .. (", f_name, ")")
-                continue
+            if f_name:
+                try:
+                    with open(f_name) as data_file:
+                        try:    
+                            data = json.load(data_file)
+                            sources_list.append(data)
+                        except:
+                            print("Cannot read json file .. (", f_name, ")")
+                            return None
+                except:
+                    print("File not found .. (", f_name, ")")
+                    continue
         for element in sources_list:
             T_names, DFs = self.read_tables(element)
             for i in range(len(T_names)):
