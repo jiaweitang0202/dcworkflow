@@ -29,8 +29,10 @@ class node:
         self.tracking_file = os.path.abspath(tracker)
     
     def printNode(self):
+        print("Node class:", self.node_functionality)
         print("input file:", self.input_file)
         print("output file:", self.output_file)
+        print("tracking file:", self.tracking_file)
         print("input sources:", self.input_sources)
         print("==================================")
 
@@ -114,19 +116,20 @@ class Project:
                 shutil.rmtree(Project_Directory)
                 self.Project_Name = ""
         elif self.Project_Name:
-            Project_Directory = WorkingDir + slef.Project_Name
+            Project_Directory = WorkingDir + self.Project_Name
+            Proj_Name = self.Project_Name
             if os.path.exists(Project_Directory):
                 shutil.rmtree(Project_Directory)
                 self.Project_Name = ""
                 for n in self.wg.get_nodes():
                     if self.nodes_details.get(n.get_name()):
                         del self.nodes_details[n.get_name()]
-                    Proj.wg.del_node(n)
+                    self.wg.del_node(n)
                 for e in self.wg.get_edges():
                     self.wg.del_edge(e.get_source(), e.get_destination())
                 self.wg = None               
                 
-                print ("Project ( ", Project_Name, ") has been deleted successfully .. ")
+                print ("Project ( ", Proj_Name, ") has been deleted successfully .. ")
         else:
             print("Project is not available or it has been closed .. ")
 
@@ -266,9 +269,10 @@ class Project:
             if T.lower() == 'csv':
                 if not (tables_list[T]['table']):
                     Ts, DFs = read_csv_directory(tables_list[T]['dir'])
-                    for i in range(len(Ts)):
-                        tNames.append(Ts[i])
-                        dFrames.append(DFs[i])
+                    if Ts:
+                        for i in range(len(Ts)):
+                            tNames.append(Ts[i])
+                            dFrames.append(DFs[i])
                 else:
                     if not tables_list[T]['dir'].endswith('/'):
                         tables_list[T]['dir'] = tables_list[T]['dir'] + '/'
